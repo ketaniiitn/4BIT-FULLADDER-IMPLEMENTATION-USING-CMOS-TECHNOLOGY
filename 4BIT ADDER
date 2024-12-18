@@ -1,0 +1,59 @@
+/* 4bit adder
+
+vdd 2 0 dc 5v
+
+.subckt inv 1 2 3
+m1 3 1 0 0 nmod w=100u l=10u
+m2 3 1 2 2 pmod w=100u l=10u
+.ends
+
+.subckt xor 4 5 6 2
+xv4_inv 4 2 7 inv
+xv5_inv 5 2 8 inv
+
+m3 6 4 8 8 nmod w=100u l=10u
+m4 6 7 5 5 pmod  w=100u l=10u
+
+.ends
+
+.subckt and 12 13 14 2
+m11 14 12 13 13 nmod w=100u l=10u
+m12 14 12 0 0 pmod   w=100u l=10u
+.ends
+
+.subckt or 26 27 28
+m15 28 26 26 26 nmod w=100u l=10u
+m16 28 26 27 27 pmod w=100u l=10u
+
+.ends
+
+.subckt fulladder 16 17 18 19 20           ; 19:sum,20:carry
+xv1 16 17 21 2 xor
+xsum 21 18 19 2 xor
+
+xc1 21 18 22 2 and
+xc2 16 17 23 2 and
+
+xc 22 23 20 or
+.ends
+
+va0 31 0 pulse(0 5 0 0 0 100m 200m)
+va1 32 0 dc 0v
+va2 33 0 dc 0v
+va3 34 0 dc 0v
+
+vb0 35 0 pulse(0 5 0 0 0 50m 100m)
+vb1 36 0 dc 0v
+vb2 37 0 dc 0v
+vb3 38 0 dc 0v
+
+xs0_c0 31 35 0 39 40 fulladder
+xs1_c1 32 36 39 41 42 fulladder
+xs2_c2 33 37 41 43 44 fulladder
+xs3_c3 34 38 43 45 46 fulladder
+
+.model nmod nmos level=54 version=4.7
+.model pmod pmos level=54 version=4.7
+
+.tran 0.1m 400m
+.end
